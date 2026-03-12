@@ -4,7 +4,8 @@ Ein KI-gesteuerter Terminal-Agent, der lokale LLMs (über Ollama) nutzt, um Term
 
 ## Überblick
 
-MishClaw ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadministrator agiert. Er kann Terminal-Befehle ausführen, um Aufgaben zu lösen, wobei Sicherheitsrichtlinien eingehalten werden.
+MishClaw ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadministrator agiert. Er kann Terminal-Befehle ausführen, um
+Aufgaben zu lösen, wobei Sicherheitsrichtlinien eingehalten werden.
 
 ## Features
 
@@ -13,14 +14,14 @@ MishClaw ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadminis
 - **Chat-Kontext**: Verwaltet Gesprächsverlauf für kontextuelles Verständnis
 - **Tool-Support**: Nutzt Function Calling für Terminal-Operationen
 - **Sicherheitsrichtlinien**:
-  - Löscht keine Daten
-  - Beendet keine Prozesse ohne Nachfrage
-  - Fragt bei kritischen Befehlen nach
-  - Behandelt Daten mit Vorsicht
+    - Löscht keine Daten
+    - Beendet keine Prozesse ohne Nachfrage
+    - Fragt bei kritischen Befehlen nach
+    - Behandelt Daten mit Vorsicht
 
 ## Voraussetzungen
 
-- Java 17 oder höher
+- Java 25
 - Maven 3.x
 - Ollama installiert und laufend (http://localhost:11434)
 - Ein gezogenes LLM-Modell (z.B. qwen3.5:cloud)
@@ -29,33 +30,33 @@ MishClaw ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadminis
 
 ### 1. Repository klonen
 
-\`\`\`bash
-git clone <repository-url>
+```bash
+git clone git@github.com:capgeti/mishclaw.git
 cd mishclaw
-\`\`\`
+```
 
 ### 2. Ollama sicherstellen
 
-\`\`\`bash
+```bash
 ollama serve
 ollama pull qwen3.5:cloud
-\`\`\`
+```
 
 ### 3. Projekt bauen
 
-\`\`\`bash
+```bash
 mvn clean package
-mvn clean package -Pnative
-\`\`\`
+mvn clean package -Pnative 
+```
 
 ## Verwendung
 
 ### Starten des Agents
 
-\`\`\`bash
-java -jar target/mishclaw-1.0.0-SNAPSHOT.jar
+```bash
+java -jar target/mishclaw-0.1.0-SNAPSHOT.jar
 ./mishclaw
-\`\`\`
+```
 
 ### Interaktion
 
@@ -67,14 +68,14 @@ java -jar target/mishclaw-1.0.0-SNAPSHOT.jar
 
 ### Kernkomponenten
 
-| Klasse | Beschreibung |
-|--------|--------------|
-| MishClawTerminalAgent | Hauptsteuerung und Entry Point |
-| ConsoleUi | Benutzeroberfläche für Input/Output |
-| TerminalExecutor | Führt Terminal-Befehle aus |
-| OllamaClient | Kommunikation mit Ollama API |
-| ChatContext | Verwaltet Gesprächsverlauf |
-| ToolDefinitionFactory | Erstellt Tool-Definitionen |
+| Klasse                | Beschreibung                        |
+|-----------------------|-------------------------------------|
+| MishClawTerminalAgent | Hauptsteuerung und Entry Point      |
+| ConsoleUi             | Benutzeroberfläche für Input/Output |
+| TerminalExecutor      | Führt Terminal-Befehle aus          |
+| OllamaClient          | Kommunikation mit Ollama API        |
+| ChatContext           | Verwaltet Gesprächsverlauf          |
+| ToolDefinitionFactory | Erstellt Tool-Definitionen          |
 
 ## Dependencies
 
@@ -94,4 +95,4 @@ Der Agent folgt strikten Sicherheitsrichtlinien:
 ---
 
 **Erstellt von**: Michael Schwarz
-**Version**: 1.0.0-SNAPSHOT
+**Version**: 0.1.0-SNAPSHOT
