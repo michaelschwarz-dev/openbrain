@@ -1,5 +1,6 @@
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.MaskingCallback;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
@@ -48,7 +49,7 @@ public class ConsoleUi {
     private void initUserPrompt() {
         this.userPrompt = new AttributedStringBuilder()
                 .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN).bold())
-                .append("🔹")
+                .append("❯")
                 .toAnsi(terminal);
     }
 
