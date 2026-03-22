@@ -17,6 +17,8 @@ public class ConsoleUi {
 
     public ConsoleUi() {
         try {
+            setupWindowsUtf8Console();
+
             terminal = TerminalBuilder.builder()
                     .system(true)
                     .encoding(StandardCharsets.UTF_8)
@@ -28,6 +30,21 @@ public class ConsoleUi {
 
         } catch (IOException e) {
             throw new RuntimeException("Konnte Terminal nicht initialisieren: " + e.getMessage(), e);
+        }
+    }
+
+    private void setupWindowsUtf8Console() {
+        if (!System.getProperty("os.name", "").toLowerCase().contains("win")) {
+            return;
+        }
+        try {
+            new ProcessBuilder("cmd", "/c", "chcp", "65001")
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start()
+                    .waitFor();
+        } catch (Throwable ignored) {
+            // Nicht auf Windows oder cmd nicht verfügbar
         }
     }
 
