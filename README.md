@@ -70,12 +70,12 @@ java -jar target/openbrain-0.1.0-SNAPSHOT.jar
 
 | Klasse                | Beschreibung                        |
 |-----------------------|-------------------------------------|
-| OpenBrainApplication | Hauptsteuerung und Entry Point      |
+| dev.michaelschwarz.openbrain.OpenBrainApplication | Hauptsteuerung und Entry Point      |
 | ConsoleUiLanterna             | Benutzeroberfläche für Input/Output |
-| TerminalExecutor      | Führt Terminal-Befehle aus          |
-| OllamaClient          | Kommunikation mit Ollama API        |
-| ChatContext           | Verwaltet Gesprächsverlauf          |
-| ToolDefinitionFactory | Erstellt Tool-Definitionen          |
+| dev.michaelschwarz.openbrain.tools.TerminalExecutor      | Führt Terminal-Befehle aus          |
+| dev.michaelschwarz.openbrain.llm.OllamaClient          | Kommunikation mit Ollama API        |
+| dev.michaelschwarz.openbrain.llm.ChatContext           | Verwaltet Gesprächsverlauf          |
+| dev.michaelschwarz.openbrain.tools.ToolDefinitionFactory | Erstellt Tool-Definitionen          |
 
 ## Dependencies
 

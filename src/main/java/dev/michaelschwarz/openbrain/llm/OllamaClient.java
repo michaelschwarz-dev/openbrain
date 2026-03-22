@@ -1,7 +1,11 @@
+package dev.michaelschwarz.openbrain.llm;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,6 +19,7 @@ import java.util.stream.Stream;
 /**
  * Behandelt ausschließlich die HTTP-Kommunikation und das Stream-Parsing.
  */
+@ApplicationScoped
 public class OllamaClient {
     private final String url;
     private final String modelName;
@@ -25,17 +30,18 @@ public class OllamaClient {
     private StringBuilder currentContentBuilder;
     private JsonNode currentToolCalls;
 
-    public OllamaClient(String url, String modelName, ObjectMapper mapper) {
-        this.url = url;
-        this.modelName = modelName;
+    @Inject
+    public OllamaClient(ObjectMapper mapper) {
+        this.url = "http://localhost:11434/api/chat";
+        this.modelName = "qwen3.5:4b";
         this.mapper = mapper;
         this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     }
 
     public OllamaResult sendChatRequest(ChatContext context, ArrayNode tools, Consumer<String> onChunkReceived) throws Exception {
         resetStreamState();
-        String payload = buildJsonPayload(context, tools);
-        HttpRequest request = buildHttpRequest(payload);
+        var payload = buildJsonPayload(context, tools);
+        var request = buildHttpRequest(payload);
 
         processResponseStream(request, onChunkReceived);
 
@@ -48,7 +54,7 @@ public class OllamaClient {
     }
 
     private String buildJsonPayload(ChatContext context, ArrayNode tools) throws Exception {
-        ObjectNode payload = mapper.createObjectNode();
+        var payload = mapper.createObjectNode();
         payload.put("model", modelName);
         payload.put("stream", true);
         payload.set("messages", context.getMessages());
@@ -65,7 +71,7 @@ public class OllamaClient {
     }
 
     private void processResponseStream(HttpRequest request, Consumer<String> onChunkReceived) throws Exception {
-        HttpResponse<Stream<String>> response = httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
+        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofLines());
 
         response.body()
                 .filter(line -> !line.trim().isEmpty())
@@ -74,10 +80,10 @@ public class OllamaClient {
 
     private void parseStreamLine(String line, Consumer<String> onChunkReceived) {
         try {
-            JsonNode jsonLine = mapper.readTree(line);
+            var jsonLine = mapper.readTree(line);
             if (!jsonLine.has("message")) return;
 
-            JsonNode msg = jsonLine.get("message");
+            var msg = jsonLine.get("message");
             extractContent(msg, onChunkReceived);
             extractToolCalls(msg);
 
@@ -88,7 +94,7 @@ public class OllamaClient {
 
     private void extractContent(JsonNode msg, Consumer<String> onChunkReceived) {
         if (msg.has("content") && !msg.get("content").isNull()) {
-            String chunk = msg.get("content").asText();
+            var chunk = msg.get("content").asText();
             currentContentBuilder.append(chunk);
             onChunkReceived.accept(chunk);
         }

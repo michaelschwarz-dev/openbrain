@@ -1,10 +1,15 @@
+package dev.michaelschwarz.openbrain.tui;
+
+import jakarta.enterprise.context.ApplicationScoped;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
+@ApplicationScoped
 public class ConsoleUi {
 
     private final Terminal terminal;
@@ -14,6 +19,7 @@ public class ConsoleUi {
         try {
             terminal = TerminalBuilder.builder()
                     .system(true)
+                    .encoding(StandardCharsets.UTF_8)
                     .build();
 
             lineReader = LineReaderBuilder.builder()

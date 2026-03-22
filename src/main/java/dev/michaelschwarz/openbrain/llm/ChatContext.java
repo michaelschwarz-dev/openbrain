@@ -1,16 +1,18 @@
+package dev.michaelschwarz.openbrain.llm;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-/**
- * Versteckt die Komplexität der JSON-Manipulation für den Gesprächsverlauf.
- * Jede Methode hat genau eine Aufgabe: Einen bestimmten Nachrichtentyp hinzuzufügen.
- */
+@ApplicationScoped
 public class ChatContext {
     private final ObjectMapper mapper;
     private final ArrayNode messages;
 
+    @Inject
     public ChatContext(ObjectMapper mapper) {
         this.mapper = mapper;
         this.messages = mapper.createArrayNode();
@@ -25,7 +27,7 @@ public class ChatContext {
     }
 
     public void addAssistantMessage(String content, JsonNode toolCalls) {
-        ObjectNode msg = createMessageNode("assistant", content);
+        var msg = createMessageNode("assistant", content);
         if (toolCalls != null) {
             msg.set("tool_calls", toolCalls);
         }
@@ -33,7 +35,7 @@ public class ChatContext {
     }
 
     public void addToolResultMessage(String toolName, String content) {
-        ObjectNode msg = createMessageNode("tool", content);
+        var msg = createMessageNode("tool", content);
         msg.put("name", toolName);
         messages.add(msg);
     }
@@ -43,7 +45,7 @@ public class ChatContext {
     }
 
     private ObjectNode createMessageNode(String role, String content) {
-        ObjectNode node = mapper.createObjectNode();
+        var node = mapper.createObjectNode();
         node.put("role", role);
         node.put("content", content);
         return node;
