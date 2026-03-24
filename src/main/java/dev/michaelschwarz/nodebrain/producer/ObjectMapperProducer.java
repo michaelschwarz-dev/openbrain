@@ -1,4 +1,4 @@
-package dev.michaelschwarz.openbrain.producer;
+package dev.michaelschwarz.nodebrain.producer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;

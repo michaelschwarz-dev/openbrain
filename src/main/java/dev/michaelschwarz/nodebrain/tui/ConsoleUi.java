@@ -1,4 +1,4 @@
-package dev.michaelschwarz.openbrain.tui;
+package dev.michaelschwarz.nodebrain.tui;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jline.reader.LineReader;

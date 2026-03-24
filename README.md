@@ -1,98 +1,98 @@
-# OpenBrain Terminal Agent
+# NodeBrain Terminal Agent
 
-Ein KI-gesteuerter Terminal-Agent, der lokale LLMs (über Ollama) nutzt, um Terminal-Befehle auszuführen.
+An AI-powered terminal agent that uses local LLMs (via Ollama) to execute terminal commands.
 
-## Überblick
+## Overview
 
-OpenBrain ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadministrator agiert. Er kann Terminal-Befehle ausführen, um
-Aufgaben zu lösen, wobei Sicherheitsrichtlinien eingehalten werden.
+NodeBrain is a Java-based chat agent built on Quarkus, Picocli, and JLine. It can execute terminal commands to solve tasks.
 
 ## Features
 
-- **LLM-Integration**: Verbindet sich mit Ollama (standardmäßig qwen3.5:cloud)
-- **Terminal-Ausführung**: Führt Shell-Befehle sicher aus
-- **Chat-Kontext**: Verwaltet Gesprächsverlauf für kontextuelles Verständnis
-- **Tool-Support**: Nutzt Function Calling für Terminal-Operationen
-- **Sicherheitsrichtlinien**:
-    - Löscht keine Daten
-    - Beendet keine Prozesse ohne Nachfrage
-    - Fragt bei kritischen Befehlen nach
-    - Behandelt Daten mit Vorsicht
+- **LLM Integration**: Connects to Ollama (default: `qwen3.5:4b`)
+- **Terminal Execution**: Runs shell commands (Windows: `cmd.exe`, Linux/macOS: `bash`)
+- **Chat Context**: Manages conversation history with system, user, assistant, and tool messages
+- **Tool Support**: Uses function calling for terminal operations (`run_terminal`)
+- **Streaming Responses**: Real-time output of LLM responses
+- **Windows UTF-8 Support**: Automatic codepage switching on Windows
 
-## Voraussetzungen
+## Prerequisites
 
 - Java 25
 - Maven 3.x
-- Ollama installiert und laufend (http://localhost:11434)
-- Ein gezogenes LLM-Modell (z.B. qwen3.5:cloud)
+- Ollama installed and running (`http://localhost:11434`)
+- An LLM model (e.g., `qwen3.5:4b`)
 
 ## Installation
 
-### 1. Repository klonen
+### 1. Clone the repository
 
 ```bash
-git clone git@github.com:capgeti/openbrain.git
-cd openbrain
+git clone git@github.com:capgeti/nodebrain.git
+cd nodebrain
 ```
 
-### 2. Ollama sicherstellen
+### 2. Ensure Ollama is running
 
 ```bash
 ollama serve
-ollama pull qwen3.5:cloud
+ollama pull qwen3.5:4b
 ```
 
-### 3. Projekt bauen
+### 3. Build the project
 
 ```bash
 mvn clean package
-mvn clean package -Pnative 
+# Native build (optional):
+mvn clean package -Pnative
 ```
 
-## Verwendung
+## Usage
 
-### Starten des Agents
+### Starting the agent
 
 ```bash
-java -jar target/openbrain-0.1.0-SNAPSHOT.jar
-./openbrain
+java -jar target/nodebrain-0.1.0-SNAPSHOT.jar
 ```
 
-### Interaktion
+### Interaction
 
-- Normale Eingaben: Einfach tippen und Enter drücken
-- Mehrzeilige Eingaben: '\' am Ende der Zeile
-- Beenden: 'exit' eingeben
+- Prompt: `❯ `
+- Exit: Type `exit` or press Ctrl+C
 
-## Architektur
+## Architecture
 
-### Kernkomponenten
+### Core Components
 
-| Klasse                | Beschreibung                        |
-|-----------------------|-------------------------------------|
-| dev.michaelschwarz.openbrain.OpenBrainApplication | Hauptsteuerung und Entry Point      |
-| ConsoleUiLanterna             | Benutzeroberfläche für Input/Output |
-| dev.michaelschwarz.openbrain.tools.TerminalExecutor      | Führt Terminal-Befehle aus          |
-| dev.michaelschwarz.openbrain.llm.OllamaClient          | Kommunikation mit Ollama API        |
-| dev.michaelschwarz.openbrain.llm.ChatContext           | Verwaltet Gesprächsverlauf          |
-| dev.michaelschwarz.openbrain.tools.ToolDefinitionFactory | Erstellt Tool-Definitionen          |
+| Class                   | Description                                    |
+|-------------------------|------------------------------------------------|
+| `NodeBrainApplication`  | Main controller, entry point with Picocli      |
+| `ConsoleUi`             | User interface based on JLine                  |
+| `TerminalExecutor`      | Executes terminal commands (timeout: 100s)     |
+| `OllamaClient`          | HTTP client for Ollama API with streaming      |
+| `ChatContext`           | Manages conversation history (JSON messages)   |
+| `ToolDefinitionFactory` | Creates tool definitions for function calling  |
+| `ObjectMapperProducer`  | CDI producer for Jackson ObjectMapper          |
 
-## Dependencies
+### Technologies
 
-- **Jackson** (2.15.2) - JSON Verarbeitung
-- **Apache Commons Exec** (1.3) - Prozessausführung
-- **JLine** (3.25.1) - CLI Handling
+- **Quarkus** (3.32.3) - Framework with CDI (Contexts and Dependency Injection)
+- **Picocli** - Command-line parser for CLI arguments
+- **JLine** (4.0.4) - Terminal handling and line editing
+- **Jackson** - JSON processing
+- **Apache Commons Exec** (1.6.0) - Process execution
+- **JNA** - Native Access for system integration
+- **Jansi** - ANSI console support
 
-## Sicherheitshinweise
+## System Prompt
 
-Der Agent folgt strikten Sicherheitsrichtlinien:
+The system prompt is loaded from `src/main/resources/systemprompt.md` and initializes the chat context.
 
-- Keine destruktiven Befehle (rm -rf)
-- Kein kill von Prozessen ohne Bestätigung
-- Kritische Befehle erfordern Nachfrage
-- Readonly-Operationen sind bevorzugt
+## Logging
+
+- Console logging: disabled
+- File logging: `nodebrain.log` (max. 1MB, rotation with 30 backups)
 
 ---
 
-**Erstellt von**: Michael Schwarz
+**Created by**: Michael Schwarz
 **Version**: 0.1.0-SNAPSHOT

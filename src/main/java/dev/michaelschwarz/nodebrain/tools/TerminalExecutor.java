@@ -1,4 +1,4 @@
-package dev.michaelschwarz.openbrain.tools;
+package dev.michaelschwarz.nodebrain.tools;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.exec.CommandLine;

@@ -1,4 +1,4 @@
-package dev.michaelschwarz.openbrain.llm;
+package dev.michaelschwarz.nodebrain.llm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ public class OllamaClient {
     @Inject
     public OllamaClient(ObjectMapper mapper) {
         this.url = "http://localhost:11434/api/chat";
-        this.modelName = "qwen3.5:4b";
+        this.modelName = "qwen3.5:cloud";
         this.mapper = mapper;
         this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     }

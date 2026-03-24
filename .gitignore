@@ -1,7 +1,7 @@
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/
-openbrain.log*
+nodebrain.log*
 .claude
 
 ### IntelliJ IDEA ###

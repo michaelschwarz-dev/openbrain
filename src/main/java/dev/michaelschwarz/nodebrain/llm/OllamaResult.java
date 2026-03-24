@@ -1,4 +1,4 @@
-package dev.michaelschwarz.openbrain.llm;
+package dev.michaelschwarz.nodebrain.llm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -1,12 +1,12 @@
-package dev.michaelschwarz.openbrain;
+package dev.michaelschwarz.nodebrain;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import dev.michaelschwarz.openbrain.llm.ChatContext;
-import dev.michaelschwarz.openbrain.llm.OllamaClient;
-import dev.michaelschwarz.openbrain.tools.TerminalExecutor;
-import dev.michaelschwarz.openbrain.tools.ToolDefinitionFactory;
-import dev.michaelschwarz.openbrain.tui.ConsoleUi;
+import dev.michaelschwarz.nodebrain.llm.ChatContext;
+import dev.michaelschwarz.nodebrain.llm.OllamaClient;
+import dev.michaelschwarz.nodebrain.tools.TerminalExecutor;
+import dev.michaelschwarz.nodebrain.tools.ToolDefinitionFactory;
+import dev.michaelschwarz.nodebrain.tui.ConsoleUi;
 import jakarta.inject.Inject;
 import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
@@ -16,12 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @CommandLine.Command(
-        name = "openbrain",
+        name = "nodebrain",
         mixinStandardHelpOptions = true, // Fügt automatisch -h, --help und -V, --version hinzu
-        version = "openbrain 0.1.0",
-        description = "OpenBrain AI Assistent"
+        version = "nodebrain 0.1.0",
+        description = "NodeBrain AI Assistent"
 )
-public class OpenBrainApplication implements Runnable {
+public class NodeBrainApplication implements Runnable {
 
     private final ConsoleUi ui;
     private final TerminalExecutor executor;
@@ -30,7 +30,7 @@ public class OpenBrainApplication implements Runnable {
     private final ArrayNode tools;
 
     @Inject
-    public OpenBrainApplication(ConsoleUi ui, TerminalExecutor executor, OllamaClient client, ChatContext context, ToolDefinitionFactory toolDefinitionFactory) {
+    public NodeBrainApplication(ConsoleUi ui, TerminalExecutor executor, OllamaClient client, ChatContext context, ToolDefinitionFactory toolDefinitionFactory) {
         this.ui = ui;
         this.executor = executor;
         this.client = client;
