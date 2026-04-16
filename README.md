@@ -1,98 +1,112 @@
-# OpenBrain Terminal Agent
+# Knotenhirn
 
-Ein KI-gesteuerter Terminal-Agent, der lokale LLMs (über Ollama) nutzt, um Terminal-Befehle auszuführen.
+Knotenhirn is a Model Context Protocol (MCP) server that gives LLMs a persistent, structured long-term memory backed by a Neo4j graph
+database.
 
-## Überblick
+It exposes two MCP tools — `storeRecords` and `queryMemory` — allowing an LLM to write knowledge into a typed graph and retrieve it via
+Cypher queries with fulltext search.
 
-OpenBrain ist ein Java-basierter Chat-Agent, der als hilfreicher KI-Systemadministrator agiert. Er kann Terminal-Befehle ausführen, um
-Aufgaben zu lösen, wobei Sicherheitsrichtlinien eingehalten werden.
+## Architecture & Tech Stack
 
-## Features
+* **Framework:** Java / Quarkus (uber-jar)
+* **Database:** Neo4j 5 with APOC plugin
+* **API Protocol:** Model Context Protocol (MCP) via `quarkus-mcp` (Streamable HTTP)
+* **Search:** Neo4j fulltext indexes
 
-- **LLM-Integration**: Verbindet sich mit Ollama (standardmäßig qwen3.5:cloud)
-- **Terminal-Ausführung**: Führt Shell-Befehle sicher aus
-- **Chat-Kontext**: Verwaltet Gesprächsverlauf für kontextuelles Verständnis
-- **Tool-Support**: Nutzt Function Calling für Terminal-Operationen
-- **Sicherheitsrichtlinien**:
-    - Löscht keine Daten
-    - Beendet keine Prozesse ohne Nachfrage
-    - Fragt bei kritischen Befehlen nach
-    - Behandelt Daten mit Vorsicht
+## Data Model
 
-## Voraussetzungen
+### Node Types
 
-- Java 25
-- Maven 3.x
-- Ollama installiert und laufend (http://localhost:11434)
-- Ein gezogenes LLM-Modell (z.B. qwen3.5:cloud)
+| Label        | Properties      | Purpose                                  |
+|--------------|-----------------|------------------------------------------|
+| `Topic`      | `name`, `id`    | Category / namespace (singleton by name) |
+| `Fact`       | `content`, `id` | Objective, verifiable data               |
+| `Principle`  | `content`, `id` | Rules, guidelines, preferences           |
+| `Experience` | `content`, `id` | Lessons learned, solutions to problems   |
 
-## Installation
+### Relationships
 
-### 1. Repository klonen
+| Type         | Direction                               | Purpose                         |
+|--------------|-----------------------------------------|---------------------------------|
+| `BELONGS_TO` | `Fact\|Principle\|Experience` → `Topic` | Assigns a record to a topic     |
+| `RELATED_TO` | `Any` → `Any`                           | Cross-reference between records |
 
-```bash
-git clone git@github.com:capgeti/openbrain.git
-cd openbrain
+### Indexes (auto-created on startup)
+
+| Index     | Type     | Target                                                               |
+|-----------|----------|----------------------------------------------------------------------|
+| `content` | Fulltext | `Principle\|Experience\|Fact` → `content`                            |
+| `topic`   | Fulltext | `Topic` → `name`                                                     |
+| —         | Standard | `Topic.name`, `Topic.id`, `Fact.id`, `Principle.id`, `Experience.id` |
+
+## MCP Tools
+
+### `storeRecords`
+
+Stores one or more knowledge records. Each record requires:
+
+| Field          | Type         | Description                                             |
+|----------------|--------------|---------------------------------------------------------|
+| `topic`        | String       | Topic name (auto-created via MERGE, case-sensitive)     |
+| `nodeType`     | Enum         | `FACT`, `PRINCIPLE`, or `EXPERIENCE`                    |
+| `content`      | String       | The knowledge text                                      |
+| `relatedNodes` | List\<UUID\> | Optional IDs of existing nodes to link via `RELATED_TO` |
+
+Returns a list of UUID strings for the created nodes.
+
+**Rule:** Always call `queryMemory` first to avoid duplicates and retrieve IDs for `relatedNodes`.
+
+### `queryMemory`
+
+Executes any Cypher query against the graph and returns newline-separated results.
+
+**Common queries:**
+
+```cypher
+// All topics
+MATCH (t:Topic) RETURN t.name
+
+// All records on a topic
+MATCH (t:Topic {name: "Java"})<-[:BELONGS_TO]-(n)
+RETURN labels(n)[0] AS type, n.content, n.id
+
+// Fulltext search across records
+CALL db.index.fulltext.queryNodes("content", "search term") YIELD node, score
+WHERE score > 0.8
+MATCH (node)-[:BELONGS_TO]->(t:Topic)
+RETURN node.content, t.name, score
+
+// Fulltext search across topics
+CALL db.index.fulltext.queryNodes("topic", "search term") YIELD node, score
+WHERE score > 0.8
+RETURN node.name
 ```
 
-### 2. Ollama sicherstellen
+## Local Development
+
+### Prerequisites
+
+* Java 21+
+* Docker & Docker Compose
+
+### 1. Start Neo4j
 
 ```bash
-ollama serve
-ollama pull qwen3.5:cloud
+docker compose up -d
 ```
 
-### 3. Projekt bauen
+Neo4j Browser: `http://localhost:7474` (user: `neo4j`, password: `knotenhirn`)
+
+### 2. Run the Application
 
 ```bash
-mvn clean package
-mvn clean package -Pnative 
+mvn quarkus:dev
 ```
 
-## Verwendung
+The MCP server listens on port `8080`.
 
-### Starten des Agents
+### 3. Build an Uber-JAR
 
 ```bash
-java -jar target/openbrain-0.1.0-SNAPSHOT.jar
-./openbrain
+mvn package
 ```
-
-### Interaktion
-
-- Normale Eingaben: Einfach tippen und Enter drücken
-- Mehrzeilige Eingaben: '\' am Ende der Zeile
-- Beenden: 'exit' eingeben
-
-## Architektur
-
-### Kernkomponenten
-
-| Klasse                | Beschreibung                        |
-|-----------------------|-------------------------------------|
-| dev.michaelschwarz.openbrain.OpenBrainApplication | Hauptsteuerung und Entry Point      |
-| ConsoleUiLanterna             | Benutzeroberfläche für Input/Output |
-| dev.michaelschwarz.openbrain.tools.TerminalExecutor      | Führt Terminal-Befehle aus          |
-| dev.michaelschwarz.openbrain.llm.OllamaClient          | Kommunikation mit Ollama API        |
-| dev.michaelschwarz.openbrain.llm.ChatContext           | Verwaltet Gesprächsverlauf          |
-| dev.michaelschwarz.openbrain.tools.ToolDefinitionFactory | Erstellt Tool-Definitionen          |
-
-## Dependencies
-
-- **Jackson** (2.15.2) - JSON Verarbeitung
-- **Apache Commons Exec** (1.3) - Prozessausführung
-- **JLine** (3.25.1) - CLI Handling
-
-## Sicherheitshinweise
-
-Der Agent folgt strikten Sicherheitsrichtlinien:
-
-- Keine destruktiven Befehle (rm -rf)
-- Kein kill von Prozessen ohne Bestätigung
-- Kritische Befehle erfordern Nachfrage
-- Readonly-Operationen sind bevorzugt
-
----
-
-**Erstellt von**: Michael Schwarz
-**Version**: 0.1.0-SNAPSHOT

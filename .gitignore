@@ -1,7 +1,10 @@
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/
-openbrain.log*
+knotenhirn.log*
+neo4j
+.claude
+CLAUDE.md
 
 ### IntelliJ IDEA ###
 .idea/
