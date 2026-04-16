@@ -51,6 +51,20 @@ public class StoreService {
             });
         }
 
+        if (node.supersededNodes() != null) {
+            node.supersededNodes().forEach(nodeId -> {
+                neo4jClient.runQuery("""
+                                MATCH (n {id: $newNodeId})
+                                MATCH (r {id: $nodeId})
+                                MERGE (n)-[:SUPERSEDES]->(r)
+                                """
+                        , Map.of(
+                                "newNodeId", newNodeId.toString(),
+                                "nodeId", nodeId.toString()
+                        ));
+            });
+        }
+
         return newNodeId;
     }
 }

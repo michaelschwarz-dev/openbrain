@@ -30,7 +30,9 @@ public class KnotenHirnMain {
             - PRINCIPLE: Use this for storing guidelines, specifications, rules, instructions, recipes, etc.
             - EXPERIENCE: Use this when you have resolved a difficult problem. Store the solution to the problem here.
             
-            Every record can be linked to other data points.
+            Every record can be linked to other data points via relatedNodes.
+            To replace outdated knowledge, provide the old node's ID in supersededNodes.
+            This creates a [:SUPERSEDES] edge from the new node to the old one, marking the old node as outdated.
             """)
     List<String> storeData(List<CreateNodeDTO> nodes) {
         return storeService.storeNodes(nodes).stream().map(UUID::toString).toList();
@@ -41,6 +43,8 @@ public class KnotenHirnMain {
             architecture, preferences, past decisions, or general knowledge. This searches the knowledge graph by executing the given cypher query.\s
             NOTE: Pay close attention to the Node IDs returned in the results; you will need to provide these IDs to the store tools if you ever need\s
             to update or supersede that specific information.
+            IMPORTANT: Always filter out superseded (outdated) nodes by adding: WHERE NOT (n)<-[:SUPERSEDES]-()
+            This ensures only active, current knowledge is returned.
             """)
     String queryMemory(@ToolArg(name = "query", description = "The cypher query") String query) {
         return queryService.search(query);

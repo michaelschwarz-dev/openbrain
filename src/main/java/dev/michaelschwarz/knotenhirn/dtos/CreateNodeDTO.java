@@ -7,6 +7,7 @@ public record CreateNodeDTO(
         String topic,
         DataType nodeType,
         String content,
-        List<UUID> relatedNodes
+        List<UUID> relatedNodes,
+        List<UUID> supersededNodes
 ) {
 }

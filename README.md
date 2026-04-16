@@ -30,6 +30,7 @@ Cypher queries with fulltext search.
 |--------------|-----------------------------------------|---------------------------------|
 | `BELONGS_TO` | `Fact\|Principle\|Experience` → `Topic` | Assigns a record to a topic     |
 | `RELATED_TO` | `Any` → `Any`                           | Cross-reference between records |
+| `SUPERSEDES` | `Any` → `Any`                           | Marks a node as replaced by a newer one |
 
 ### Indexes (auto-created on startup)
 
@@ -47,10 +48,11 @@ Stores one or more knowledge records. Each record requires:
 
 | Field          | Type         | Description                                             |
 |----------------|--------------|---------------------------------------------------------|
-| `topic`        | String       | Topic name (auto-created via MERGE, case-sensitive)     |
-| `nodeType`     | Enum         | `FACT`, `PRINCIPLE`, or `EXPERIENCE`                    |
-| `content`      | String       | The knowledge text                                      |
-| `relatedNodes` | List\<UUID\> | Optional IDs of existing nodes to link via `RELATED_TO` |
+| `topic`           | String       | Topic name (auto-created via MERGE, case-sensitive)                     |
+| `nodeType`        | Enum         | `FACT`, `PRINCIPLE`, or `EXPERIENCE`                                    |
+| `content`         | String       | The knowledge text                                                      |
+| `relatedNodes`    | List\<UUID\> | Optional IDs of existing nodes to link via `RELATED_TO`                 |
+| `supersededNodes` | List\<UUID\> | Optional IDs of nodes this record replaces — creates `SUPERSEDES` edges |
 
 Returns a list of UUID strings for the created nodes.
 
